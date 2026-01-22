@@ -139,7 +139,7 @@ map2 <- tm_shape(
     ),
     col = "#1A1A1A",
     shape = 21,
-    lwd = 1.5
+    lwd = 1.2
   ) +
   tm_credits(
     credits,
@@ -164,3 +164,102 @@ map2 <- tm_shape(
 
 save_map(map2, "output/food-systems.png")
 
+################################################################################
+#                        Plot report map - no labels                           # 
+################################################################################
+
+points_shape2 <- points_shape %>%
+  mutate(
+    Index = row_number()
+  ) %>%
+  relocate(Index) %>%
+  mutate(
+    text_colour = case_when(
+      `Primary Workstream` == "Multiple" ~ "white",
+      TRUE ~ "black"
+    )
+  )
+
+nudge <- function(pshape, dir, Index, change) {
+  mask = pshape$Index == Index
+  pshape$geometry[mask][[1]][[dir]] =  pshape$geometry[mask][[1]][[dir]] + change
+  return(pshape)
+}
+
+# nudge points
+points_shape2 <- nudge(points_shape2, 1, 52, -200)
+points_shape2 <- nudge(points_shape2, 2, 52, -200)
+points_shape2 <- nudge(points_shape2, 1, 40, +200)
+points_shape2 <- nudge(points_shape2, 2, 40, +200)
+points_shape2 <- nudge(points_shape2, 2, 46, +20)
+points_shape2 <- nudge(points_shape2, 2,  2, +150)
+points_shape2 <- nudge(points_shape2, 1,  2, +0)
+points_shape2 <- nudge(points_shape2, 2, 29, -60)
+points_shape2 <- nudge(points_shape2, 1, 29, -100)
+points_shape2 <- nudge(points_shape2, 2,  1, -300)
+points_shape2 <- nudge(points_shape2, 1,  1, +70)
+points_shape2 <- nudge(points_shape2, 1, 25, +60)
+points_shape2 <- nudge(points_shape2, 2, 25, +60)
+points_shape2 <- nudge(points_shape2, 1, 30, -60)
+points_shape2 <- nudge(points_shape2, 2, 30, -60)
+points_shape2 <- nudge(points_shape2, 2, 46, +100)
+points_shape2 <- nudge(points_shape2, 1, 46, -10)
+points_shape2 <- nudge(points_shape2, 2, 17, -100)
+points_shape2 <- nudge(points_shape2, 1, 17, +50)
+points_shape2 <- nudge(points_shape2, 2, 22, -100)
+points_shape2 <- nudge(points_shape2, 1, 22, +50)
+points_shape2 <- nudge(points_shape2, 2, 20, +50)
+points_shape2 <- nudge(points_shape2, 1, 20, +50)
+points_shape2 <- nudge(points_shape2, 2,  6, -50)
+points_shape2 <- nudge(points_shape2, 1,  6, -50)
+map3 <- tm_shape(
+  Brum_Wards
+) +
+  tm_borders() +
+  tm_shape(points_shape2) +
+  tm_dots(
+    fill = "Primary Workstream",
+    size = 0.8,
+    fill.scale = tm_scale(
+      breaks = names(colours),
+      values = colours
+    ),
+    col = "#1A1A1A",
+    shape = 21,
+    lwd = 1.2
+  ) +
+  tm_text(
+    text = "Index",
+    component.autoscale = FALSE,
+    size = 0.5,
+    col = "text_colour"
+  ) +
+  tm_credits(
+    credits,
+    size = 0.6,
+    position = c("LEFT", "BOTTOM")
+  ) +
+  tm_layout(
+    legend.position = c("LEFT", "TOP"),
+    scale = 0.8,
+    legend.height = 8,
+    legend.frame.alpha = 0,
+    legend.frame.lwd = 0,
+    legend.bg.alpha = 0.4,
+    inner.margins = 0.08,
+    frame = FALSE) +
+  tm_compass(
+    type = "8star",
+    size = 4,
+    position = c("right", "bottom"),
+    color.light = "white"
+  )
+
+map3
+
+save_map(map3, "output/food-systems-labelled.png")
+
+writexl::write_xlsx(
+  points_shape2 %>% sf::st_drop_geometry() %>% select(-text_colour),
+  "output/labelled_BFLF_data.xlsx"
+)
