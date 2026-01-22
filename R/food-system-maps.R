@@ -1,5 +1,6 @@
 library(BSol.mapR)
 library(dplyr)
+library(tmap)
 library(readxl)
 
 colours = list(
@@ -57,9 +58,31 @@ other2 <- data %>%
     Address != "N/A"
   )
 
-data_long <- data.table::rbindlist(
-  list(
-    main, other1, other2
+data_long <- get_long_lat(
+  data.table::rbindlist(
+    list(
+      main, other1, other2
+    )
   )
-)
+) %>%
+  select(
+    c("Name", "Address", "Postcode", "Type", "LAT", "LONG")
+  )
 
+points_shape <- sf::st_as_sf(
+    get_points_shape(
+    data_long
+  ) 
+) %>%
+  select(
+    -c(LONG, LAT)
+  )
+
+
+map <- tm_shape(
+  Ward
+  ) +
+  tm_borders() +
+  tm_shape(points_shape) +
+  tm_dots()
+map
