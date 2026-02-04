@@ -212,6 +212,16 @@ points_shape2 <- nudge(points_shape2, 2, 20, +50)
 points_shape2 <- nudge(points_shape2, 1, 20, +50)
 points_shape2 <- nudge(points_shape2, 2,  6, -50)
 points_shape2 <- nudge(points_shape2, 1,  6, -50)
+points_shape2 <- nudge(points_shape2, 2,  58, +400)
+points_shape2 <- nudge(points_shape2, 1,  58, -400)
+points_shape2 <- nudge(points_shape2, 2,  38, -400)
+points_shape2 <- nudge(points_shape2, 1,  38, +400)
+
+points_shape2 <- nudge(points_shape2, 2,  42, +130)
+points_shape2 <- nudge(points_shape2, 1,  42, +150)
+points_shape2 <- nudge(points_shape2, 2,  54, -130)
+points_shape2 <- nudge(points_shape2, 1,  54, -150)
+
 map3 <- tm_shape(
   Brum_Wards
 ) +
